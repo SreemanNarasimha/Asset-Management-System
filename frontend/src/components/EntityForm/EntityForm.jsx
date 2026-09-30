@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import styles from './EntityForm.module.css';
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080/api';
 
 export default function EntityForm({ title, endpoint, fields, description }) {
   const [formData, setFormData] = useState({});

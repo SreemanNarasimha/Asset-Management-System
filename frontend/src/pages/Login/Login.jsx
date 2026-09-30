@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import styles from './Login.module.css';
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080/api';
 
 export default function Login({ setAuth }) {
   const [credentials, setCredentials] = useState({ username: '', password: '' });

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Card from '../../components/Card/Card';
 import styles from './Dashboard.module.css';
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080/api';
 
 export default function Dashboard({ auth }) {
   const [metrics, setMetrics] = useState({ available: 0, assigned: 0, transfers: 0 });
