@@ -62,6 +62,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/debug")
+    public java.util.List<User> debugUsers() {
+        return userRepository.findAll();
+    }
+
     @GetMapping("/me")
     public AuthUser me(@AuthenticationPrincipal AuthUser user) {
         return user;
