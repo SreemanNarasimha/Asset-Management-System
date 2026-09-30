@@ -48,4 +48,21 @@ public class UserController {
     public void delete(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
+
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public User update(@PathVariable Long id, @RequestBody User req) {
+        User existing = userRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        req.setPasswordHash(existing.getPasswordHash());
+        if (req.getRole() != null && req.getRole().getId() != null) req.setRole(roleRepository.findById(req.getRole().getId()).orElseThrow());
+        else req.setRole(existing.getRole());
+
+        
+        User saved = userRepository.save(req);
+        auditService.log("UPDATE_USER", "USER", saved.getId(), saved.getBaseId(), null, saved);
+        return saved;
+    }
 }

@@ -42,5 +42,18 @@ public class TransferController {
     public void delete(@PathVariable Long id) {
         transferRepository.deleteById(id);
     }
-}
 
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public Transfer update(@PathVariable Long id, @RequestBody Transfer req) {
+        Transfer existing = transferRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        
+        
+        Transfer saved = transferRepository.save(req);
+        
+        return saved;
+    }
+}

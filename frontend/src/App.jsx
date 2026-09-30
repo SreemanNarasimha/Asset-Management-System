@@ -207,6 +207,7 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
   const [form, setForm] = useState({});
   const [error, setError] = useState('');
   const [items, setItems] = useState([]);
+  const [editingId, setEditingId] = useState(null);
   
   const [filters, setFilters] = useState({ date: '', equipmentTypeId: '' });
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -254,15 +255,39 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
         }
       }
 
-      await axios.post(`${API_BASE}/${endpoint}`, payload);
-      alert(`${title} created successfully!`);
+      if (editingId) {
+        await axios.put(`${API_BASE}/${endpoint}/${editingId}`, payload);
+        alert(`${title} updated successfully!`);
+      } else {
+        await axios.post(`${API_BASE}/${endpoint}`, payload);
+        alert(`${title} created successfully!`);
+      }
+      
       setError('');
       setForm({});
+      setEditingId(null);
       e.target.reset();
       fetchItems();
     } catch (err) {
-      setError(err.response?.data?.message || `Error creating ${title}`);
+      setError(err.response?.data?.message || `Error saving ${title}`);
     }
+  };
+
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+    const newForm = {};
+    for (const field of fields) {
+      if (field.name.includes('.')) {
+        const [parent, child] = field.name.split('.');
+        if (item[parent] && item[parent][child] !== undefined) {
+          newForm[field.name] = item[parent][child];
+        }
+      } else {
+        newForm[field.name] = item[field.name];
+      }
+    }
+    setForm(newForm);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -288,20 +313,25 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
     <div>
       <h2 className="form-title">{title}</h2>
       <div className="form-card">
-        <h3 className="form-header">Add New</h3>
+        <h3 className="form-header">{editingId ? 'Edit Record' : 'Add New'}</h3>
         {error && <p className="error-text">{error}</p>}
         <form onSubmit={handleCreate} className="grid-form">
           {fields.map(f => (
             f.type === 'select' ? (
-              <select className="form-input" key={f.name} required={f.required !== false} onChange={e => setForm({ ...form, [f.name]: e.target.value })}>
+              <select className="form-input" key={f.name} required={f.required !== false} value={form[f.name] || ''} onChange={e => setForm({ ...form, [f.name]: e.target.value })}>
                 <option value="">Select {f.label}</option>
                 {f.options.map(o => <option key={o.value || o} value={o.value || o}>{o.label || o}</option>)}
               </select>
             ) : (
-              <input className="form-input" key={f.name} placeholder={f.label} required={f.required !== false} type={f.type || 'text'} onChange={e => setForm({ ...form, [f.name]: e.target.value })} />
+              <input className="form-input" key={f.name} placeholder={f.label} required={f.required !== false && (!editingId || f.name !== 'passwordHash')} type={f.type || 'text'} value={form[f.name] || ''} onChange={e => setForm({ ...form, [f.name]: e.target.value })} />
             )
           ))}
-          <button className="submit-button" type="submit">Submit</button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button className="submit-button" type="submit">{editingId ? 'Update' : 'Submit'}</button>
+            {editingId && (
+              <button type="button" className="submit-button" style={{ background: '#e74c3c' }} onClick={() => { setEditingId(null); setForm({}); }}>Cancel</button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -345,7 +375,10 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
                       <td key={f.name}>{String(getNestedValue(item, f.name) ?? '')}</td>
                     ))}
                     <td>
-                      <button className="delete-button" onClick={() => handleDelete(item.id)}>Delete</button>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button className="submit-button" style={{ padding: '0.25rem 0.5rem', minWidth: 'auto', background: '#3498db' }} onClick={() => handleEdit(item)}>Edit</button>
+                        <button className="delete-button" style={{ padding: '0.25rem 0.5rem', minWidth: 'auto' }} onClick={() => handleDelete(item.id)}>Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}

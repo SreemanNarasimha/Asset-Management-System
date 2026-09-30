@@ -39,5 +39,18 @@ public class EquipmentTypeController {
     public void delete(@PathVariable Long id) {
         equipmentTypeRepository.deleteById(id);
     }
-}
 
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public EquipmentType update(@PathVariable Long id, @RequestBody EquipmentType req) {
+        EquipmentType existing = equipmentTypeRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        
+        
+        EquipmentType saved = equipmentTypeRepository.save(req);
+        auditService.log("UPDATE_EQUIPMENTTYPE", "EQUIPMENTTYPE", saved.getId(), null, null, saved);
+        return saved;
+    }
+}

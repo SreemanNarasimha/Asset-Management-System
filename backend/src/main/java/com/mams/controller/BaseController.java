@@ -39,5 +39,18 @@ public class BaseController {
     public void delete(@PathVariable Long id) {
         baseRepository.deleteById(id);
     }
-}
 
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public Base update(@PathVariable Long id, @RequestBody Base req) {
+        Base existing = baseRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        
+        
+        Base saved = baseRepository.save(req);
+        auditService.log("UPDATE_BASE", "BASE", saved.getId(), saved.getId(), null, saved);
+        return saved;
+    }
+}

@@ -42,5 +42,18 @@ public class ExpenditureController {
     public void delete(@PathVariable Long id) {
         expenditureRepository.deleteById(id);
     }
-}
 
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public Expenditure update(@PathVariable Long id, @RequestBody Expenditure req) {
+        Expenditure existing = expenditureRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        
+        
+        Expenditure saved = expenditureRepository.save(req);
+        
+        return saved;
+    }
+}

@@ -58,5 +58,18 @@ public class PurchaseController {
     public void delete(@PathVariable Long id) {
         purchaseRepository.deleteById(id);
     }
-}
 
+    @PutMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public Purchase update(@PathVariable Long id, @RequestBody Purchase req) {
+        Purchase existing = purchaseRepository.findById(id).orElseThrow();
+        req.setId(id);
+        
+        // Retain original fields if needed
+        
+        
+        Purchase saved = purchaseRepository.save(req);
+        
+        return saved;
+    }
+}
