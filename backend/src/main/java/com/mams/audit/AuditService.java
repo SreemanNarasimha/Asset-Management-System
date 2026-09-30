@@ -34,7 +34,7 @@ public class AuditService {
             if (newValue != null) newValStr = objectMapper.writeValueAsString(newValue);
         } catch (Exception ignored) {}
 
-        String sql = "INSERT INTO audit_logs (user_id, role, action, entity_type, entity_id, base_id, old_value, new_value, result, created_at, session_id) " +
+        String sql = "INSERT INTO audit_logs (user_id, `role`, action, entity_type, entity_id, base_id, old_value, new_value, result, created_at, session_id) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS', ?, ?)";
         
         jdbcTemplate.update(sql, user.getId(), user.getRoleName(), action, entityType, entityId, baseId, oldValStr, newValStr, LocalDateTime.now(), user.getSessionId());
