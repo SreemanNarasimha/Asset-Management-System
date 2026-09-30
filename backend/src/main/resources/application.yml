@@ -19,4 +19,4 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000 # 24 hours
 cors:
-  allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+  allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000,https://military-ams.vercel.app}
