@@ -244,6 +244,7 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
     try {
       const payload = {};
       for (const key in form) {
+        if (form[key] === '') continue;
         if (key.includes('.')) {
           const [parent, child] = key.split('.');
           if (!payload[parent]) payload[parent] = {};
@@ -292,12 +293,12 @@ function GenericForm({ title, endpoint, fields, allowFilters }) {
         <form onSubmit={handleCreate} className="grid-form">
           {fields.map(f => (
             f.type === 'select' ? (
-              <select className="form-input" key={f.name} required onChange={e => setForm({ ...form, [f.name]: e.target.value })}>
+              <select className="form-input" key={f.name} required={f.required !== false} onChange={e => setForm({ ...form, [f.name]: e.target.value })}>
                 <option value="">Select {f.label}</option>
                 {f.options.map(o => <option key={o.value || o} value={o.value || o}>{o.label || o}</option>)}
               </select>
             ) : (
-              <input className="form-input" key={f.name} placeholder={f.label} required type={f.type || 'text'} onChange={e => setForm({ ...form, [f.name]: e.target.value })} />
+              <input className="form-input" key={f.name} placeholder={f.label} required={f.required !== false} type={f.type || 'text'} onChange={e => setForm({ ...form, [f.name]: e.target.value })} />
             )
           ))}
           <button className="submit-button" type="submit">Submit</button>
@@ -594,7 +595,7 @@ function App() {
         <Route path="/inventory" element={auth ? <Layout auth={auth} logout={logout}><Inventory auth={auth} /></Layout> : <Navigate to="/login" />} />
         <Route path="/audit-logs" element={auth ? <Layout auth={auth} logout={logout}><AuditLogs auth={auth} /></Layout> : <Navigate to="/login" />} />
         <Route path="/bases" element={auth?.role === 'ADMIN' ? <Layout auth={auth} logout={logout}><GenericForm title="Add Base (Admin)" endpoint="bases" fields={[{ name: 'code', label: 'Base Code' }, { name: 'name', label: 'Base Name' }, { name: 'location', label: 'Location' }]} /></Layout> : <Navigate to="/" />} />
-        <Route path="/users" element={auth?.role === 'ADMIN' ? <Layout auth={auth} logout={logout}><GenericForm title="Add System User (Admin)" endpoint="users" fields={[{ name: 'username', label: 'Username' }, { name: 'email', label: 'Email' }, { name: 'passwordHash', label: 'Password (Plain)', type: 'password', hideInTable: true }, { name: 'role.id', label: 'Role', type: 'select', options: roleOptions }, { name: 'baseId', label: 'Base ID (Leave blank for Admin)', type: 'number' }]} /></Layout> : <Navigate to="/" />} />
+        <Route path="/users" element={auth?.role === 'ADMIN' ? <Layout auth={auth} logout={logout}><GenericForm title="Add System User (Admin)" endpoint="users" fields={[{ name: 'username', label: 'Username' }, { name: 'email', label: 'Email' }, { name: 'passwordHash', label: 'Password (Plain)', type: 'password', hideInTable: true }, { name: 'role.id', label: 'Role', type: 'select', options: roleOptions }, { name: 'baseId', label: 'Base ID (Leave blank for Admin)', type: 'number', required: false }]} /></Layout> : <Navigate to="/" />} />
         <Route path="/equipment-types" element={auth?.role === 'ADMIN' ? <Layout auth={auth} logout={logout}><GenericForm title="Add Equipment Type" endpoint="equipment-types" fields={[{ name: 'name', label: 'Name' }, { name: 'category', label: 'Category', type: 'select', options: categoryOptions }, { name: 'unit', label: 'Unit (e.g. piece, kg)' }, { name: 'description', label: 'Description' }]} /></Layout> : <Navigate to="/" />} />
         <Route path="/personnel" element={(auth?.role === 'ADMIN' || auth?.role === 'BASE_COMMANDER') ? <Layout auth={auth} logout={logout}><GenericForm title="Add Personnel" endpoint="personnel" fields={[{ name: 'serviceNumber', label: 'Service Number' }, { name: 'name', label: 'Full Name' }, { name: 'rankName', label: 'Rank', type: 'select', options: rankOptions }, { name: 'baseId', label: 'Base ID', type: 'number' }]} /></Layout> : <Navigate to="/" />} />
         <Route path="/transfers" element={(auth?.role === 'ADMIN' || auth?.role === 'LOGISTICS_OFFICER' || auth?.role === 'BASE_COMMANDER') ? <Layout auth={auth} logout={logout}><GenericForm title="Transfers" endpoint="transfers" fields={[{ name: 'sourceBaseId', label: 'Source Base ID', type: 'number' }, { name: 'destinationBaseId', label: 'Destination Base ID', type: 'number' }, { name: 'equipmentTypeId', label: 'Equipment Type ID', type: 'number' }, { name: 'quantity', label: 'Quantity', type: 'number' }, { name: 'transferDate', label: 'Transfer Date', type: 'date' }, { name: 'referenceNumber', label: 'Ref Number' }, { name: 'notes', label: 'Notes' }]} /></Layout> : <Navigate to="/" />} />
