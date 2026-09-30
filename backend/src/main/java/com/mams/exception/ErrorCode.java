@@ -1,0 +1,12 @@
+package com.mams.exception;
+
+public enum ErrorCode {
+    UNAUTHORIZED,
+    FORBIDDEN,
+    NOT_FOUND,
+    VALIDATION_ERROR,
+    INSUFFICIENT_INVENTORY,
+    DUPLICATE_REFERENCE,
+    INVALID_TRANSFER,
+    TRANSACTION_FAILED
+}
