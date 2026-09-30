@@ -574,7 +574,7 @@ function App() {
     });
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get(`${API_BASE}/auth/me`).then(res => setAuth(res.data)).catch(() => localStorage.removeItem('token'));
+      axios.get(`${API_BASE}/auth/me`).then(res => setAuth({ ...res.data, role: res.data.role || res.data.roleName })).catch(() => localStorage.removeItem('token'));
     }
   }, []);
 
